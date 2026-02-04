@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import re
 from constants.const import links
 from utils.functions import scrapingTunisieTravail, scrapingTuniJob
 def scraping(page: str):
@@ -15,8 +14,19 @@ def scraping(page: str):
             # Find all articles/offers
             if(link == "https://www.tunisietravail.net/page/"):
                 res = scrapingTunisieTravail(soup, url)
-            else:
+            elif(link == "https://www.tunijobs.com/jobs?page="):
                 res = scrapingTuniJob(soup, url, page)
+            else:
+                articles = soup.find_all("article")
+                if articles:
+                    a = articles.find("a")
+                    if a:
+                        lien = a.get("href")
+                        if not lien:
+                            continue
+        
+                        if not lien.startswith("http"):
+                            lien = url.rstrip('/').replace("/?page="+str(page), "") + '/' + lien.lstrip('/')
         else:
             print(f"Erreur: {response.status_code}")
             return []
